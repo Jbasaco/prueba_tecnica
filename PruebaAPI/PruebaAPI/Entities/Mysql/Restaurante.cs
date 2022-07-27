@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PruebaAPI.Entities
+namespace PruebaAPI.Entities.Mysql
 {
     public class Restaurante
     {

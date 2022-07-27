@@ -1,4 +1,4 @@
-﻿using PruebaAPI.Entities;
+﻿using PruebaAPI.Entities.Mysql;
 
 namespace PruebaAPI.Service
 {

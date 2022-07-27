@@ -1,7 +1,7 @@
 ﻿namespace PruebaAPI.Helpers
 {
     using Microsoft.EntityFrameworkCore;
-    using PruebaAPI.Entities;
+    using PruebaAPI.Entities.Mysql;
 
     public class DataContext : DbContext
     {

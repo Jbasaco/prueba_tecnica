@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using PruebaAPI.Entities;
+using PruebaAPI.Entities.Mongo;
+using PruebaAPI.Entities.Mysql;
 using PruebaAPI.Models;
+using PruebaAPI.Repository.Mongo;
 using PruebaAPI.Service;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -16,15 +18,16 @@ namespace PruebaAPI.Controllers
         private readonly ILogger<PruebaTecnicaController> _logger;
         private readonly IRestauranteService _restauranteService;
         private readonly IPedidoService _pedidoService;
+        private readonly IPedidoMongoService _pedidoMongoService;
 
-
-        public PruebaTecnicaController(ILogger<PruebaTecnicaController> logger, IRestauranteService restauranteService, IPedidoService pedidoService)
+        public PruebaTecnicaController(ILogger<PruebaTecnicaController> logger, IRestauranteService restauranteService, IPedidoService pedidoService,IPedidoMongoService pedidoMongoService)
         {
             _logger = logger;
             _restauranteService = restauranteService;
             _pedidoService = pedidoService;
+            _pedidoMongoService = pedidoMongoService;
         }
-
+        //Consulta a la API WeatherTask y revuelve la temperatura y la humedad
         [HttpGet(Name = "GetClimaActual")]
 
         public async Task<WeatherTask> GetClimaActual(string ciudad)
@@ -53,17 +56,11 @@ namespace PruebaAPI.Controllers
             return respuesta;
         }
 
-
-        [HttpGet(Name ="GetRestaurante")]
-        public ActionResult<Restaurante> GetRestaurante(string nombre)
-        {
-            Restaurante restaurante = _restauranteService.get(nombre);
-
-            return restaurante;
-        }
-
+        //Crea un pedido a partir de los campos que recibe(cabecera, detalle, nombre del Restaurante). 
+        //A partir del restaurante, obtiene la ubicación, y con ella la temperatura y la humedad utilizando el servicio de arriba.
+        //Acto seguido, guarda en Mysql y MongoDB
         [HttpPost(Name = "GuardarPedido")]
-        public async Task<Pedido> GuardarPedido(PedidoModel pedido)
+        public async Task<MongoPedido> GuardarPedido(PedidoModel pedido)
         {
             Pedido p = new Pedido();
 
@@ -80,7 +77,10 @@ namespace PruebaAPI.Controllers
 
             Pedido created = _pedidoService.guardar(p);
 
-            return created;
+            MongoPedido mped = new MongoPedido(created, res.nombreRestaurante);
+   
+
+            return _pedidoMongoService.Crear(mped); 
         }
     }
 }

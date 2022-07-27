@@ -1,18 +1,40 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using PruebaAPI.Entities.Mongo;
 using PruebaAPI.Helpers;
-using PruebaAPI.Repository;
 using PruebaAPI.Repository.Core;
+using PruebaAPI.Repository.Mongo;
+using PruebaAPI.Repository.MySQL;
 using PruebaAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+#region configuración Mongo
+
+
+builder.Services.Configure<PedidoDBConf>(
+builder.Configuration.GetSection("MongoDBSettings"));
+
+builder.Services.AddSingleton<IPedidoDBConf>(sp =>
+sp.GetRequiredService<IOptions<PedidoDBConf>>().Value);
+
+builder.Services.AddSingleton<IMongoClient>(s =>
+new MongoClient(builder.Configuration.GetValue<string>("MongoDBSettings:ConnectionString")));
+builder.Services.AddScoped<IPedidoMongoService, PedidoMongoServiceImpl>();
+
+
+#endregion
+
+
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+#region Configuración MYSQL
 builder.Services.AddDbContext<DataContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("ApiMysqlBD");
@@ -24,6 +46,8 @@ builder.Services.AddScoped<IRestauranteService, RestauranteServiceImpl>();
 
 builder.Services.AddScoped<IPedidoRepository, PedidoRepositoryImpl>();
 builder.Services.AddScoped<IPedidoService, PedidoServiceImpl>();
+#endregion
+
 
 var app = builder.Build();
 

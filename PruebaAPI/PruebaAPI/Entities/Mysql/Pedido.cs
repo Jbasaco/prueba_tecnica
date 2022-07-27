@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PruebaAPI.Entities
+namespace PruebaAPI.Entities.Mysql
 {
     public class Pedido
     {

@@ -1,5 +1,5 @@
-﻿using PruebaAPI.Entities;
-using PruebaAPI.Repository;
+﻿using PruebaAPI.Entities.Mysql;
+using PruebaAPI.Repository.MySQL;
 
 namespace PruebaAPI.Service
 {
